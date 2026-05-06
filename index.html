@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>미술시간</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+  <nav class="topnav">
+    <div class="nav-logo">미술시간</div>
+    <div class="nav-right">
+      <div class="nav-period">
+        <select id="yearSelect"></select>
+        <select id="monthSelect"></select>
+      </div>
+      <button class="nav-btn active" data-view="attendance">출석</button>
+      <button class="nav-btn" data-view="students">학생 관리</button>
+      <button class="nav-btn" data-view="week5">5주차 설정</button>
+      <button class="nav-btn" data-view="export">출석 내보내기</button>
+      <button class="nav-btn" data-view="settings">전체 설정</button>
+    </div>
+  </nav>
+
+  <main id="app">
+
+    <!-- ── Attendance View ────────────────────────── -->
+    <section id="view-attendance" class="view active">
+      <div class="view-header">
+        <h2 id="attendance-title"></h2>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button id="btn-refresh-data" class="btn-secondary">새로고침</button>
+          <button id="btn-copy-schedules" class="btn-secondary" style="display:none">
+            이전 달 스케줄 복사
+          </button>
+        </div>
+      </div>
+      <div id="no-students-msg" class="empty-msg" style="display:none">
+        등록된 학생이 없습니다. 학생 관리 메뉴에서 학생을 추가하세요.
+      </div>
+      <div class="attendance-table-wrapper">
+        <table id="attendance-table">
+          <thead></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ── Student Management View ───────────────── -->
+    <section id="view-students" class="view">
+      <div class="view-header">
+        <h2>학생 관리</h2>
+        <button id="btn-add-student" class="btn-primary">+ 학생 추가</button>
+      </div>
+      <div id="students-period-label" class="period-label"></div>
+      <div class="students-table-wrapper">
+        <table id="students-table">
+          <thead>
+            <tr>
+              <th>이름</th>
+              <th>연락처</th>
+              <th>수업 요일 / 시간</th>
+              <th>출석/수업</th>
+              <th>월 목표</th>
+              <th>납부 여부</th>
+              <th>등록일</th>
+              <th>관리</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ── Week 5 Settings View ───────────────────── -->
+    <section id="view-week5" class="view">
+      <div class="view-header">
+        <h2 id="week5-title">5주차 설정</h2>
+        <div style="display:flex;gap:8px">
+          <button id="btn-week5-auto" class="btn-secondary">5주차 자동 선택</button>
+          <button id="btn-save-week5" class="btn-primary">저장</button>
+        </div>
+      </div>
+      <p class="week5-desc">비활성화할 날짜를 클릭하여 선택하세요. 선택된 날짜는 출석 체크가 불가합니다.</p>
+      <div id="week5-calendar"></div>
+      <div id="week5-disabled-list" class="disabled-dates-list"></div>
+    </section>
+
+    <!-- ── Export View ────────────────────────────── -->
+    <section id="view-export" class="view">
+      <div class="view-header">
+        <h2>출석 내보내기</h2>
+      </div>
+      <div class="export-content">
+        <p id="export-desc"></p>
+        <button id="btn-export-csv" class="btn-primary">CSV 다운로드 (Excel)</button>
+      </div>
+    </section>
+
+    <!-- ── Settings View ──────────────────────────── -->
+    <section id="view-settings" class="view">
+      <div class="view-header">
+        <h2>전체 설정</h2>
+      </div>
+      <div class="settings-content">
+        <div class="settings-section">
+          <h3>비활성화된 날짜 관리</h3>
+          <p class="settings-hint">모든 비활성화 날짜를 확인하고 개별 삭제할 수 있습니다.</p>
+          <div id="settings-disabled-dates"></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ── Popup ──────────────────────────────────── -->
+  <div id="popup-overlay" class="popup-overlay hidden">
+    <div class="popup-box">
+      <div class="popup-header">
+        <h3 id="popup-title"></h3>
+        <button class="popup-close" id="popup-close">&times;</button>
+      </div>
+      <div class="popup-body" id="popup-body"></div>
+      <div class="popup-footer" id="popup-footer"></div>
+    </div>
+  </div>
+
+  <!-- ── Loading ────────────────────────────────── -->
+  <div id="loading-overlay" class="loading-overlay hidden">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- ── Toast ──────────────────────────────────── -->
+  <div id="toast" class="toast"></div>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyC29LANi2LgZdCSkmCAcMZkp_51Z715FbE",
+    authDomain: "timetodraw-3f6e7.firebaseapp.com",
+    projectId: "timetodraw-3f6e7",
+    storageBucket: "timetodraw-3f6e7.appspot.com", // 🔥 이거 수정
+    messagingSenderId: "822955347984",
+    appId: "1:822955347984:web:0d5763f30589af5e517a95"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+</script>
+
+<script src="firebase.js"></script>
+<script src="app.js"></script>
+
+</body>
+
+</html>
