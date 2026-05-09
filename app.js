@@ -992,6 +992,50 @@
     }
   }
 
-  init();
+  // ── Auth ──────────────────────────────────────────────────────
+  const loginOverlay  = $('login-overlay');
+  const loginEmailEl  = $('login-email');
+  const loginPassEl   = $('login-password');
+  const loginErrorEl  = $('login-error');
+
+  let appInitialized = false;
+
+  firebase.auth().onAuthStateChanged(async user => {
+    if (user) {
+      loginOverlay.classList.add('hidden');
+      if (!appInitialized) {
+        appInitialized = true;
+        await init();
+      }
+    } else {
+      loginOverlay.classList.remove('hidden');
+    }
+  });
+
+  $('btn-login').onclick = async () => {
+    const email    = loginEmailEl.value.trim();
+    const password = loginPassEl.value;
+    loginErrorEl.style.display = 'none';
+    if (!email || !password) {
+      loginErrorEl.textContent = '이메일과 비밀번호를 입력하세요.';
+      loginErrorEl.style.display = '';
+      return;
+    }
+    try {
+      await firebase.auth().signInWithEmailAndPassword(email, password);
+    } catch (e) {
+      const msg = (e.code === 'auth/invalid-credential' || e.code === 'auth/wrong-password' || e.code === 'auth/user-not-found')
+        ? '이메일 또는 비밀번호가 올바르지 않습니다.'
+        : e.message;
+      loginErrorEl.textContent = msg;
+      loginErrorEl.style.display = '';
+    }
+  };
+
+  loginPassEl.addEventListener('keydown', e => {
+    if (e.key === 'Enter') $('btn-login').click();
+  });
+
+  $('btn-logout').onclick = () => firebase.auth().signOut();
 
 })();

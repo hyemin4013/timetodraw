@@ -22,8 +22,20 @@
       <button class="nav-btn" data-view="week5">5주차 설정</button>
       <button class="nav-btn" data-view="export">출석 내보내기</button>
       <button class="nav-btn" data-view="settings">전체 설정</button>
+      <button id="btn-logout" class="nav-btn nav-btn-logout">로그아웃</button>
     </div>
   </nav>
+
+  <!-- ── Login Overlay ──────────────────────────── -->
+  <div id="login-overlay" class="login-overlay">
+    <div class="login-box">
+      <div class="login-logo">미술시간</div>
+      <input type="email" id="login-email" class="login-input" placeholder="이메일" autocomplete="username" />
+      <input type="password" id="login-password" class="login-input" placeholder="비밀번호" autocomplete="current-password" />
+      <div id="login-error" class="login-error" style="display:none"></div>
+      <button id="btn-login" class="btn-primary login-btn">로그인</button>
+    </div>
+  </div>
 
   <main id="app">
 
@@ -137,20 +149,20 @@
   <div id="toast" class="toast"></div>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 
 <script>
   const firebaseConfig = {
     apiKey: "AIzaSyC29LANi2LgZdCSkmCAcMZkp_51Z715FbE",
     authDomain: "timetodraw-3f6e7.firebaseapp.com",
     projectId: "timetodraw-3f6e7",
-    storageBucket: "timetodraw-3f6e7.appspot.com", 
+    storageBucket: "timetodraw-3f6e7.appspot.com",
     messagingSenderId: "822955347984",
     appId: "1:822955347984:web:0d5763f30589af5e517a95"
   };
 
   firebase.initializeApp(firebaseConfig);
 </script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="firebase.js"></script>
 <script src="app.js"></script>
 
